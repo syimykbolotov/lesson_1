@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface AppType {
   id: number;
@@ -13,10 +15,35 @@ const App = () => {
   const [user, setUser] = useState<AppType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const error = () => {
+    toast.error("🦄 You must write something!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+  const success = () => {
+    toast.success("🦄 Product is  added successfully!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+
   const getData = async () => {
     try {
       const { data } = await axios.get(
-        `https://api-v2.elchocrud.pro/api/v1/9079067ed2f267cd61f5d3de64cfbffa/product`
+        `https://api-v2.elchocrud.pro/api/v1/4215f307702be4f1d33334cb09af3f26/tesla`
       );
       setUser(data);
       console.log(data);
@@ -29,11 +56,11 @@ const App = () => {
 
   const postData = async () => {
     try {
-      if (value === "") {
-        alert("Toltuuur ");
+      if (value === "" || photo === "") {
+        error();
       } else {
         const { data } = await axios.post(
-          `https://api-v2.elchocrud.pro/api/v1/9079067ed2f267cd61f5d3de64cfbffa/product`,
+          `https://api-v2.elchocrud.pro/api/v1/4215f307702be4f1d33334cb09af3f26/tesla`,
           {
             name: value,
             image: photo,
@@ -41,10 +68,13 @@ const App = () => {
         );
         setUser(data);
         console.log(data);
+        setValue("")
+        setPhoto("")
+        success()
       }
     } catch (e) {
       console.log(e);
-    } 
+    }
   };
 
   console.log(user, "user");
@@ -53,34 +83,37 @@ const App = () => {
     getData();
   }, []);
   return (
-    <div>
-      <div className="">
-        <button onClick={postData}>Add</button>
+    <div className="container all">
+      <div className="add">
         <input
           type="text"
           value={value}
+          placeholder="Name"
           onChange={(e) => setValue(e.target.value)}
         />
         <input
           type="text"
           value={photo}
+          placeholder="URL..."
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setPhoto(e.target.value)
           }
         />
-        {isLoading ? (
-          <h1>Loading...</h1>
-        ) : (
-          <div className="user">
-            {user.map((el) => (
-              <div key={el.id} className="">
-                <h1>{el.name}</h1>
-                <img src={el.image} alt="img" />
-              </div>
-            ))}
-          </div>
-        )}
+        <button onClick={postData}>Add</button>
       </div>
+      {isLoading ? (
+        <h1 className="load">Loading...</h1>
+      ) : (
+        <div className="user">
+          {user.map((el) => (
+            <div key={el.id} className="post">
+              <img src={el.image} alt="img" />
+              <h1>{el.name}</h1>
+            </div>
+          ))}
+        </div>
+      )}
+      <ToastContainer />
     </div>
   );
 };
